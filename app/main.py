@@ -222,13 +222,13 @@ async def api_info():
 
 
 # Include API routes
-# Note: These will be implemented in the next steps
-# from app.routes import poll_routes, vote_routes, user_routes, like_routes, websocket_routes
-# app.include_router(poll_routes.router, prefix="/api/polls", tags=["Polls"])
-# app.include_router(vote_routes.router, prefix="/api/votes", tags=["Votes"])
-# app.include_router(user_routes.router, prefix="/api/users", tags=["Users"])
-# app.include_router(like_routes.router, prefix="/api/likes", tags=["Likes"])
-# app.include_router(websocket_routes.router, prefix="/ws", tags=["WebSocket"])
+from app.routes import poll_routes, vote_routes, user_routes, like_routes, websocket_routes
+
+app.include_router(poll_routes.router, prefix="/api/polls", tags=["Polls"])
+app.include_router(vote_routes.router, prefix="/api/votes", tags=["Votes"])
+app.include_router(user_routes.router, prefix="/api/users", tags=["Users"])
+app.include_router(like_routes.router, prefix="/api/likes", tags=["Likes"])
+app.include_router(websocket_routes.router, prefix="/ws", tags=["WebSocket"])
 
 
 if __name__ == "__main__":

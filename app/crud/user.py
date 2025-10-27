@@ -64,9 +64,46 @@ class UserCRUD:
         """Get user by email."""
         return db.query(User).filter(User.email == email.lower()).first()
     
-    def get_multiple(self, db: Session, skip: int = 0, limit: int = 100) -> List[User]:
+    def get_multiple(self, db: Session, skip: int = 0, limit: int = 100, search: Optional[str] = None) -> List[User]:
         """Get multiple users with pagination."""
-        return db.query(User).offset(skip).limit(limit).all()
+        query = db.query(User)
+        
+        if search:
+            query = query.filter(User.username.ilike(f"%{search}%"))
+        
+        return query.offset(skip).limit(limit).all()
+    
+    def count(self, db: Session) -> int:
+        """Count total users."""
+        return db.query(User).count()
+    
+    def get_by_username_or_email(self, db: Session, identifier: str) -> Optional[User]:
+        """Get user by username or email."""
+        # Try username first
+        user = self.get_by_username(db, identifier)
+        
+        # If not found, try email
+        if not user and '@' in identifier:
+            user = self.get_by_email(db, identifier)
+        
+        return user
+    
+    def update_last_login(self, db: Session, user_id: UUID) -> bool:
+        """Update user's last login time."""
+        user = self.get(db, user_id)
+        if not user:
+            return False
+        
+        user.last_login = func.now()
+        db.commit()
+        return True
+    
+    def get_user_polls(self, db: Session, user_id: UUID, skip: int = 0, limit: int = 20) -> List[Poll]:
+        """Get polls created by a user."""
+        from app.models.poll import Poll
+        return db.query(Poll).filter(
+            Poll.author_id == user_id
+        ).order_by(desc(Poll.created_at)).offset(skip).limit(limit).all()
     
     def update(self, db: Session, user_id: UUID, user_data: UserUpdate) -> Optional[User]:
         """

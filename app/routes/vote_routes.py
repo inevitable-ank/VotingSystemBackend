@@ -7,7 +7,7 @@ import logging
 from app.core.db import get_db
 from app.crud.vote import vote_crud
 from app.crud.poll import poll_crud
-from app.schemas.vote import VoteCreate, VoteResponse, VoteStats
+from app.schemas.vote import VoteCreate, VoteResponse, VoteStats, MultipleVoteCreate
 from app.schemas.user import UserResponse
 from app.utils.response_helper import (
     success_response, error_response, paginated_response, 
@@ -95,14 +95,17 @@ async def cast_vote(
                 )
         
         # Create votes
-        votes = vote_crud.create_multiple(
-            db=db,
+        multiple_vote_data = MultipleVoteCreate(
             poll_id=vote_data.poll_id,
             option_ids=vote_data.option_ids,
-            user_id=voter_id,
             anon_id=anon_id,
             ip_address=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent")
+        )
+        votes = vote_crud.create_multiple(
+            db=db,
+            vote_data=multiple_vote_data,
+            user_id=voter_id
         )
         
         # Update poll vote counts

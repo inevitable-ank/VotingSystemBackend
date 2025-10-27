@@ -353,6 +353,50 @@ class VoteCRUD:
             "poll_expired": poll.is_expired,
             "poll_active": poll.is_active
         }
+    
+    def get_multiple(self, db: Session, skip: int = 0, limit: int = 100, 
+                    poll_id: Optional[UUID] = None, user_id: Optional[UUID] = None) -> List[Vote]:
+        """Get multiple votes with optional filtering."""
+        query = db.query(Vote)
+        
+        if poll_id:
+            query = query.filter(Vote.poll_id == poll_id)
+        if user_id:
+            query = query.filter(Vote.user_id == user_id)
+        
+        return query.order_by(desc(Vote.created_at)).offset(skip).limit(limit).all()
+    
+    def count(self, db: Session, poll_id: Optional[UUID] = None, user_id: Optional[UUID] = None) -> int:
+        """Count votes with optional filtering."""
+        query = db.query(Vote)
+        
+        if poll_id:
+            query = query.filter(Vote.poll_id == poll_id)
+        if user_id:
+            query = query.filter(Vote.user_id == user_id)
+        
+        return query.count()
+    
+    def count_by_poll(self, db: Session, poll_id: UUID) -> int:
+        """Count votes for a specific poll."""
+        return db.query(Vote).filter(Vote.poll_id == poll_id).count()
+    
+    def count_by_user(self, db: Session, user_id: UUID) -> int:
+        """Count votes by a specific user."""
+        return db.query(Vote).filter(Vote.user_id == user_id).count()
+    
+    def count_by_anonymous(self, db: Session, anon_id: str) -> int:
+        """Count votes by an anonymous user."""
+        return db.query(Vote).filter(Vote.anon_id == anon_id).count()
+    
+    def get_by_anonymous(self, db: Session, anon_id: str, skip: int = 0, limit: int = 100) -> List[Vote]:
+        """Get votes by an anonymous user."""
+        return db.query(Vote).filter(Vote.anon_id == anon_id).order_by(desc(Vote.created_at)).offset(skip).limit(limit).all()
+    
+    def get_by_liker(self, db: Session, poll_id: UUID, user_id: Optional[UUID] = None, 
+                    anon_id: Optional[str] = None) -> Optional[Vote]:
+        """Get vote by liker (alias for get_user_vote for consistency)."""
+        return self.get_user_vote(db, poll_id, user_id, anon_id)
 
 
 # Create instance

@@ -68,12 +68,15 @@ async def like_poll(
             )
         
         # Create like
-        like = like_crud.create(
-            db=db,
+        like_data = LikeCreate(
             poll_id=poll_id,
-            user_id=liker_id,
             anon_id=anon_id,
             ip_address=request.client.host if request.client else None
+        )
+        like = like_crud.create(
+            db=db,
+            like_data=like_data,
+            user_id=liker_id
         )
         
         # Update poll likes count

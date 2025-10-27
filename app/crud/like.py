@@ -284,9 +284,49 @@ class LikeCRUD:
             Poll.is_active == True
         ).order_by(desc(Poll.likes_count)).offset(skip).limit(limit).all()
     
-    def get_recent_likes(self, db: Session, skip: int = 0, limit: int = 50) -> List[Like]:
-        """Get recent likes across all polls."""
-        return db.query(Like).order_by(desc(Like.created_at)).offset(skip).limit(limit).all()
+    def get_multiple(self, db: Session, skip: int = 0, limit: int = 100, 
+                    poll_id: Optional[UUID] = None, user_id: Optional[UUID] = None) -> List[Like]:
+        """Get multiple likes with optional filtering."""
+        query = db.query(Like)
+        
+        if poll_id:
+            query = query.filter(Like.poll_id == poll_id)
+        if user_id:
+            query = query.filter(Like.user_id == user_id)
+        
+        return query.order_by(desc(Like.created_at)).offset(skip).limit(limit).all()
+    
+    def count(self, db: Session, poll_id: Optional[UUID] = None, user_id: Optional[UUID] = None) -> int:
+        """Count likes with optional filtering."""
+        query = db.query(Like)
+        
+        if poll_id:
+            query = query.filter(Like.poll_id == poll_id)
+        if user_id:
+            query = query.filter(Like.user_id == user_id)
+        
+        return query.count()
+    
+    def count_by_poll(self, db: Session, poll_id: UUID) -> int:
+        """Count likes for a specific poll."""
+        return db.query(Like).filter(Like.poll_id == poll_id).count()
+    
+    def count_by_user(self, db: Session, user_id: UUID) -> int:
+        """Count likes by a specific user."""
+        return db.query(Like).filter(Like.user_id == user_id).count()
+    
+    def count_by_anonymous(self, db: Session, anon_id: str) -> int:
+        """Count likes by an anonymous user."""
+        return db.query(Like).filter(Like.anon_id == anon_id).count()
+    
+    def get_by_anonymous(self, db: Session, anon_id: str, skip: int = 0, limit: int = 100) -> List[Like]:
+        """Get likes by an anonymous user."""
+        return db.query(Like).filter(Like.anon_id == anon_id).order_by(desc(Like.created_at)).offset(skip).limit(limit).all()
+    
+    def get_by_liker(self, db: Session, poll_id: UUID, user_id: Optional[UUID] = None, 
+                    anon_id: Optional[str] = None) -> Optional[Like]:
+        """Get like by liker (alias for get_user_like for consistency)."""
+        return self.get_user_like(db, poll_id, user_id, anon_id)
 
 
 # Create instance
