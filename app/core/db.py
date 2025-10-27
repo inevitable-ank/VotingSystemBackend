@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
@@ -88,7 +88,7 @@ def check_database_connection() -> bool:
     """
     try:
         with engine.connect() as connection:
-            connection.execute("SELECT 1")
+            connection.execute(text("SELECT 1"))
         logger.info("Database connection successful")
         return True
     except Exception as e:
@@ -133,7 +133,7 @@ def health_check() -> dict:
     try:
         with engine.connect() as connection:
             # Test basic query
-            result = connection.execute("SELECT 1 as health_check")
+            result = connection.execute(text("SELECT 1 as health_check"))
             health_status = result.fetchone()[0] == 1
         
         return {

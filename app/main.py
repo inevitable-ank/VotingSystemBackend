@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
         logger.info("Database tables created/verified")
         
         # Test Redis connection
-        redis_client = get_redis_client()
+        redis_client = await get_redis_client()
         if redis_client:
             await redis_client.ping()
             logger.info("Redis connection successful")
@@ -148,7 +148,7 @@ async def health_check_endpoint():
         redis_health = {"status": "unknown"}
         
         # Check Redis if available
-        redis_client = get_redis_client()
+        redis_client = await get_redis_client()
         if redis_client:
             try:
                 await redis_client.ping()

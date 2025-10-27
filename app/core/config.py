@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379"
     redis_password: Optional[str] = None
     
+    # Upstash Redis REST API Configuration
+    upstash_redis_rest_url: Optional[str] = None
+    upstash_redis_rest_token: Optional[str] = None
+    
     # Security Configuration
     secret_key: str = "your-secret-key-change-in-production"
     algorithm: str = "HS256"

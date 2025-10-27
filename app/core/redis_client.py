@@ -3,6 +3,7 @@ from typing import Optional
 import logging
 
 from app.core.config import settings
+from app.core.upstash_redis_client import get_upstash_client, UpstashRedisClient
 
 logger = logging.getLogger(__name__)
 
@@ -10,15 +11,22 @@ logger = logging.getLogger(__name__)
 _redis_client: Optional[redis.Redis] = None
 
 
-async def get_redis_client() -> Optional[redis.Redis]:
+async def get_redis_client():
     """
-    Get Redis client instance.
+    Get Redis client instance (either Upstash REST or traditional Redis).
     
     Returns:
-        Optional[redis.Redis]: Redis client or None if connection fails
+        Redis client or None if connection fails
     """
     global _redis_client
     
+    # Try Upstash REST API first
+    if settings.upstash_redis_rest_url and settings.upstash_redis_rest_token:
+        upstash_client = await get_upstash_client()
+        if upstash_client:
+            return upstash_client
+    
+    # Fallback to traditional Redis
     if _redis_client is None:
         try:
             _redis_client = redis.from_url(

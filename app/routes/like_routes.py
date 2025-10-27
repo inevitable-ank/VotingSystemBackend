@@ -37,8 +37,8 @@ def get_anonymous_id(request: Request) -> str:
 
 @router.post("/poll/{poll_id}", response_model=dict)
 async def like_poll(
-    poll_id: UUID = Path(..., description="Poll ID"),
     request: Request,
+    poll_id: UUID = Path(..., description="Poll ID"),
     db: Session = Depends(get_db),
     current_user: Optional[UserResponse] = Depends(get_current_user)
 ):
@@ -112,8 +112,8 @@ async def like_poll(
 
 @router.delete("/poll/{poll_id}", response_model=dict)
 async def unlike_poll(
-    poll_id: UUID = Path(..., description="Poll ID"),
     request: Request,
+    poll_id: UUID = Path(..., description="Poll ID"),
     db: Session = Depends(get_db),
     current_user: Optional[UserResponse] = Depends(get_current_user)
 ):

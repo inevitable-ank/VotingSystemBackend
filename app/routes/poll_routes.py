@@ -261,8 +261,8 @@ async def create_poll(
 
 @router.get("/{poll_id}", response_model=dict)
 async def get_poll(
-    poll_id: UUID = Path(..., description="Poll ID"),
     request: Request,
+    poll_id: UUID = Path(..., description="Poll ID"),
     db: Session = Depends(get_db)
 ):
     """Get a specific poll by ID."""
@@ -292,8 +292,8 @@ async def get_poll(
 
 @router.get("/slug/{slug}", response_model=dict)
 async def get_poll_by_slug(
-    slug: str = Path(..., description="Poll slug"),
     request: Request,
+    slug: str = Path(..., description="Poll slug"),
     db: Session = Depends(get_db)
 ):
     """Get a specific poll by slug."""

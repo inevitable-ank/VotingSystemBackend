@@ -117,6 +117,20 @@ class UserNotFoundError(NotFoundError):
         super().__init__(resource="User", identifier=user_id)
 
 
+class VoteNotFoundError(NotFoundError):
+    """Exception for vote not found."""
+    
+    def __init__(self, vote_id: str):
+        super().__init__(resource="Vote", identifier=vote_id)
+
+
+class LikeNotFoundError(NotFoundError):
+    """Exception for like not found."""
+    
+    def __init__(self, like_id: str):
+        super().__init__(resource="Like", identifier=like_id)
+
+
 class DuplicateVoteError(ConflictError):
     """Exception for duplicate vote attempts."""
     

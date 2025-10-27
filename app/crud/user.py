@@ -5,6 +5,7 @@ from uuid import UUID
 import logging
 
 from app.models.user import User
+from app.models.poll import Poll
 from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import get_password_hash, verify_password, generate_anonymous_id
 from app.utils.exceptions import UserNotFoundError, ConflictError, ValidationError
