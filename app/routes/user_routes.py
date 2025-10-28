@@ -316,7 +316,7 @@ async def update_user(
         if not updated_user:
             return not_found_response(resource="User", identifier=str(user_id))
         
-        user_response = UserResponse.from_orm(updated_user)
+        user_response = UserResponse.model_validate(updated_user)
         
         return updated_response(
             data=user_response,

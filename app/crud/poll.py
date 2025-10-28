@@ -57,6 +57,14 @@ class PollCRUD:
         db.commit()
         db.refresh(db_poll)
         
+        # Load options with the poll for percentage calculation
+        db_poll = db.query(Poll).options(joinedload(Poll.options)).filter(Poll.id == db_poll.id).first()
+        
+        # Update vote counts to ensure proper percentage calculation
+        db_poll.update_vote_counts()
+        db.commit()
+        db.refresh(db_poll)
+        
         logger.info(f"Poll created: {db_poll.title} (ID: {db_poll.id})")
         return db_poll
     

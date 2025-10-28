@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, ConfigDict, computed_field
 from typing import Optional, List
 from datetime import datetime
 from uuid import UUID
@@ -74,17 +74,34 @@ class PollResponse(PollBase):
     total_votes: int
     likes_count: int
     views_count: int
-    can_vote: bool
-    is_expired: bool
     
-    class Config:
-        from_attributes = True
+    @computed_field
+    @property
+    def can_vote(self) -> bool:
+        """Check if poll can accept votes."""
+        if not self.is_active:
+            return False
+        if self.expires_at and self.expires_at < datetime.now():
+            return False
+        return True
+    
+    @computed_field
+    @property
+    def is_expired(self) -> bool:
+        """Check if poll has expired."""
+        if not self.expires_at:
+            return False
+        return self.expires_at < datetime.now()
+    
+    model_config = ConfigDict(from_attributes=True, json_encoders={UUID: str})
 
 
 class PollDetail(PollResponse):
     """Schema for detailed poll response."""
     options: List['OptionResponse'] = []
     author: Optional['UserResponse'] = None
+    
+    model_config = ConfigDict(from_attributes=True, json_encoders={UUID: str})
 
 
 class PollList(BaseModel):

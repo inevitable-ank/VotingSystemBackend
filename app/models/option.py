@@ -31,19 +31,22 @@ class Option(Base):
     def __repr__(self):
         return f"<Option(id={self.id}, text={self.text[:30]}...)>"
     
+    @property
+    def percentage(self) -> float:
+        """Calculate vote percentage."""
+        if self.poll and self.poll.total_votes > 0:
+            return round((self.vote_count / self.poll.total_votes) * 100, 2)
+        return 0.0
+    
     def to_dict(self):
         """Convert option to dictionary."""
-        percentage = 0
-        if self.poll and self.poll.total_votes > 0:
-            percentage = (self.vote_count / self.poll.total_votes) * 100
-        
         return {
             "id": str(self.id),
             "poll_id": str(self.poll_id),
             "text": self.text,
             "position": self.position,
             "vote_count": self.vote_count,
-            "percentage": round(percentage, 2)
+            "percentage": self.percentage
         }
     
     def increment_votes(self):

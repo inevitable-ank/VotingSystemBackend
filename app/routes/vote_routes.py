@@ -111,7 +111,7 @@ async def cast_vote(
         # Update poll vote counts
         poll_crud.update_vote_counts(db=db, poll_id=vote_data.poll_id)
         
-        vote_responses = [VoteResponse.from_orm(vote) for vote in votes]
+        vote_responses = [VoteResponse.model_validate(vote) for vote in votes]
         
         return created_response(
             data=vote_responses,
@@ -162,7 +162,7 @@ async def get_poll_votes(
         
         total = vote_crud.count_by_poll(db=db, poll_id=poll_id)
         
-        vote_responses = [VoteResponse.from_orm(vote) for vote in votes]
+        vote_responses = [VoteResponse.model_validate(vote) for vote in votes]
         
         return paginated_response(
             data=vote_responses,
@@ -227,7 +227,7 @@ async def get_user_votes(
         
         total = vote_crud.count_by_user(db=db, user_id=user_id)
         
-        vote_responses = [VoteResponse.from_orm(vote) for vote in votes]
+        vote_responses = [VoteResponse.model_validate(vote) for vote in votes]
         
         return paginated_response(
             data=vote_responses,
@@ -264,7 +264,7 @@ async def get_anonymous_votes(
         
         total = vote_crud.count_by_anonymous(db=db, anon_id=anon_id)
         
-        vote_responses = [VoteResponse.from_orm(vote) for vote in votes]
+        vote_responses = [VoteResponse.model_validate(vote) for vote in votes]
         
         return paginated_response(
             data=vote_responses,
@@ -295,7 +295,7 @@ async def get_vote(
         if not vote:
             return not_found_response(resource="Vote", identifier=str(vote_id))
         
-        vote_response = VoteResponse.from_orm(vote)
+        vote_response = VoteResponse.model_validate(vote)
         
         return success_response(
             data=vote_response,
@@ -380,7 +380,7 @@ async def get_votes(
         
         total = vote_crud.count(db=db, poll_id=poll_id, user_id=user_id)
         
-        vote_responses = [VoteResponse.from_orm(vote) for vote in votes]
+        vote_responses = [VoteResponse.model_validate(vote) for vote in votes]
         
         return paginated_response(
             data=vote_responses,

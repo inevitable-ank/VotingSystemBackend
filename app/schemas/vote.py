@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, ConfigDict
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
@@ -62,8 +62,7 @@ class VoteResponse(VoteBase):
     created_at: datetime
     option_text: Optional[str] = None
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True, json_encoders={UUID: str})
 
 
 class VoteUpdate(BaseModel):

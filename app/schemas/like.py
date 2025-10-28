@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, ConfigDict
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
@@ -30,8 +30,7 @@ class LikeResponse(LikeBase):
     ip_address: Optional[str] = None
     created_at: datetime
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True, json_encoders={UUID: str})
 
 
 class LikeStats(BaseModel):

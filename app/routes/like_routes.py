@@ -82,7 +82,7 @@ async def like_poll(
         # Update poll likes count
         poll_crud.update_likes_count(db=db, poll_id=poll_id)
         
-        like_response = LikeResponse.from_orm(like)
+        like_response = LikeResponse.model_validate(like)
         
         return created_response(
             data=like_response,
@@ -189,7 +189,7 @@ async def get_poll_likes(
         
         total = like_crud.count_by_poll(db=db, poll_id=poll_id)
         
-        like_responses = [LikeResponse.from_orm(like) for like in likes]
+        like_responses = [LikeResponse.model_validate(like) for like in likes]
         
         return paginated_response(
             data=like_responses,
@@ -254,7 +254,7 @@ async def get_user_likes(
         
         total = like_crud.count_by_user(db=db, user_id=user_id)
         
-        like_responses = [LikeResponse.from_orm(like) for like in likes]
+        like_responses = [LikeResponse.model_validate(like) for like in likes]
         
         return paginated_response(
             data=like_responses,
@@ -291,7 +291,7 @@ async def get_anonymous_likes(
         
         total = like_crud.count_by_anonymous(db=db, anon_id=anon_id)
         
-        like_responses = [LikeResponse.from_orm(like) for like in likes]
+        like_responses = [LikeResponse.model_validate(like) for like in likes]
         
         return paginated_response(
             data=like_responses,
@@ -322,7 +322,7 @@ async def get_like(
         if not like:
             return not_found_response(resource="Like", identifier=str(like_id))
         
-        like_response = LikeResponse.from_orm(like)
+        like_response = LikeResponse.model_validate(like)
         
         return success_response(
             data=like_response,
@@ -407,7 +407,7 @@ async def get_likes(
         
         total = like_crud.count(db=db, poll_id=poll_id, user_id=user_id)
         
-        like_responses = [LikeResponse.from_orm(like) for like in likes]
+        like_responses = [LikeResponse.model_validate(like) for like in likes]
         
         return paginated_response(
             data=like_responses,

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, validator, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 from uuid import UUID
@@ -38,8 +38,7 @@ class UserResponse(UserBase):
     updated_at: str
     last_login: Optional[str] = None
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True, json_encoders={UUID: str})
 
 
 class UserLogin(BaseModel):
@@ -60,8 +59,7 @@ class UserProfile(BaseModel):
     votes_count: int = 0
     likes_count: int = 0
     
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True, json_encoders={UUID: str})
 
 
 class AnonymousUser(BaseModel):

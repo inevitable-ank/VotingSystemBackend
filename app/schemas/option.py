@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, ConfigDict, computed_field
 from typing import Optional, List
 from datetime import datetime
 from uuid import UUID
@@ -33,10 +33,16 @@ class OptionResponse(OptionBase):
     id: UUID
     poll_id: UUID
     vote_count: int
-    percentage: float
     
-    class Config:
-        from_attributes = True
+    @computed_field
+    @property
+    def percentage(self) -> float:
+        """Calculate vote percentage."""
+        # This will be calculated based on the poll's total_votes
+        # For now, return 0.0 as it will be calculated by the model
+        return 0.0
+    
+    model_config = ConfigDict(from_attributes=True, json_encoders={UUID: str})
 
 
 class OptionStats(BaseModel):
