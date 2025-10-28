@@ -31,12 +31,12 @@ class UserUpdate(BaseModel):
 
 class UserResponse(UserBase):
     """Schema for user response."""
-    id: UUID
+    id: str
     is_active: bool
     is_verified: bool
-    created_at: datetime
-    updated_at: datetime
-    last_login: Optional[datetime] = None
+    created_at: str
+    updated_at: str
+    last_login: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -44,18 +44,18 @@ class UserResponse(UserBase):
 
 class UserLogin(BaseModel):
     """Schema for user login."""
-    username: str = Field(..., description="Username or email")
+    username_or_email: str = Field(..., description="Username or email")
     password: str = Field(..., description="Password")
 
 
 class UserProfile(BaseModel):
     """Schema for user profile."""
-    id: UUID
+    id: str
     username: str
     email: Optional[str] = None
     is_active: bool
     is_verified: bool
-    created_at: datetime
+    created_at: str
     polls_count: int = 0
     votes_count: int = 0
     likes_count: int = 0

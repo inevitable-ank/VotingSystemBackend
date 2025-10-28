@@ -221,6 +221,9 @@ async def api_info():
     }
 
 
+# Import all models to ensure they are registered with SQLAlchemy
+from app.models import User, Poll, Option, Vote, Like
+
 # Include API routes
 from app.routes import poll_routes, vote_routes, user_routes, like_routes, websocket_routes
 

@@ -19,6 +19,20 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+def user_to_response(user) -> UserResponse:
+    """Convert User model to UserResponse schema."""
+    return UserResponse(
+        id=str(user.id),
+        username=user.username,
+        email=user.email,
+        is_active=user.is_active,
+        is_verified=user.is_verified,
+        created_at=user.created_at.isoformat() if user.created_at else None,
+        updated_at=user.updated_at.isoformat() if user.updated_at else None,
+        last_login=user.last_login.isoformat() if user.last_login else None
+    )
+
+
 @router.post("/register", response_model=dict)
 async def register_user(
     user_data: UserCreate,
@@ -51,7 +65,8 @@ async def register_user(
         # Create access token
         access_token = create_access_token(data={"sub": str(user.id)})
         
-        user_response = UserResponse.from_orm(user)
+        # Create user response with proper UUID serialization
+        user_response = user_to_response(user)
         
         return created_response(
             data={
@@ -116,7 +131,8 @@ async def login_user(
         # Create access token
         access_token = create_access_token(data={"sub": str(user.id)})
         
-        user_response = UserResponse.from_orm(user)
+        # Create user response with proper UUID serialization
+        user_response = user_to_response(user)
         
         return success_response(
             data={
@@ -203,7 +219,7 @@ async def get_users(
         
         total = user_crud.count(db=db)
         
-        user_responses = [UserResponse.from_orm(user) for user in users]
+        user_responses = [user_to_response(user) for user in users]
         
         return paginated_response(
             data=user_responses,
@@ -234,7 +250,7 @@ async def get_user(
         if not user:
             return not_found_response(resource="User", identifier=str(user_id))
         
-        user_response = UserResponse.from_orm(user)
+        user_response = user_to_response(user)
         
         return success_response(
             data=user_response,
@@ -262,7 +278,7 @@ async def get_user_by_username(
         if not user:
             return not_found_response(resource="User", identifier=username)
         
-        user_response = UserResponse.from_orm(user)
+        user_response = user_to_response(user)
         
         return success_response(
             data=user_response,

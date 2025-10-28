@@ -54,7 +54,8 @@ async def get_polls(
             include_expired=include_expired
         )
         
-        total = db.query(poll_crud.model).count()
+        from app.models.poll import Poll
+        total = db.query(Poll).count()
         
         poll_responses = [PollResponse.from_orm(poll) for poll in polls]
         
