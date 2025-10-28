@@ -57,7 +57,7 @@ async def get_polls(
         from app.models.poll import Poll
         total = db.query(Poll).count()
         
-        poll_responses = [PollResponse.model_validate(poll) for poll in polls]
+        poll_responses = [poll.to_dict() for poll in polls]
         
         return paginated_response(
             data=poll_responses,
@@ -85,7 +85,7 @@ async def get_public_polls(
     """Get public polls."""
     try:
         polls = poll_crud.get_public(db=db, skip=skip, limit=limit)
-        poll_responses = [PollResponse.model_validate(poll) for poll in polls]
+        poll_responses = [poll.to_dict() for poll in polls]
         
         return success_response(
             data=poll_responses,
@@ -109,7 +109,7 @@ async def get_trending_polls(
     """Get trending polls."""
     try:
         polls = poll_crud.get_trending(db=db, skip=skip, limit=limit)
-        poll_responses = [PollResponse.model_validate(poll) for poll in polls]
+        poll_responses = [poll.to_dict() for poll in polls]
         
         return success_response(
             data=poll_responses,
@@ -133,7 +133,7 @@ async def get_popular_polls(
     """Get popular polls."""
     try:
         polls = poll_crud.get_popular(db=db, skip=skip, limit=limit)
-        poll_responses = [PollResponse.model_validate(poll) for poll in polls]
+        poll_responses = [poll.to_dict() for poll in polls]
         
         return success_response(
             data=poll_responses,
@@ -157,7 +157,7 @@ async def get_recent_polls(
     """Get recent polls."""
     try:
         polls = poll_crud.get_recent(db=db, skip=skip, limit=limit)
-        poll_responses = [PollResponse.model_validate(poll) for poll in polls]
+        poll_responses = [poll.to_dict() for poll in polls]
         
         return success_response(
             data=poll_responses,
@@ -182,7 +182,7 @@ async def search_polls(
     """Search polls by title or description."""
     try:
         polls = poll_crud.search(db=db, query=q, skip=skip, limit=limit)
-        poll_responses = [PollResponse.model_validate(poll) for poll in polls]
+        poll_responses = [poll.to_dict() for poll in polls]
         
         return success_response(
             data=poll_responses,
@@ -277,7 +277,7 @@ async def get_poll(
         # Increment view count
         poll_crud.increment_views(db=db, poll_id=poll_id)
         
-        poll_response = PollDetail.model_validate(poll)
+        poll_response = poll.to_dict()
         
         return success_response(
             data=poll_response,
@@ -308,7 +308,7 @@ async def get_poll_by_slug(
         # Increment view count
         poll_crud.increment_views(db=db, poll_id=poll.id)
         
-        poll_response = PollDetail.model_validate(poll)
+        poll_response = poll.to_dict()
         
         return success_response(
             data=poll_response,
@@ -354,7 +354,7 @@ async def update_poll(
         if not updated_poll:
             return not_found_response(resource="Poll", identifier=str(poll_id))
         
-        poll_response = PollResponse.model_validate(updated_poll)
+        poll_response = updated_poll.to_dict()
         
         return updated_response(
             data=poll_response,

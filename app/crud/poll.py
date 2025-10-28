@@ -92,7 +92,7 @@ class PollCRUD:
     def get_multiple(self, db: Session, skip: int = 0, limit: int = 20, 
                     include_expired: bool = False) -> List[Poll]:
         """Get multiple polls with pagination."""
-        query = db.query(Poll)
+        query = db.query(Poll).options(joinedload(Poll.options))
         
         if not include_expired:
             query = query.filter(
@@ -106,7 +106,7 @@ class PollCRUD:
     
     def get_public(self, db: Session, skip: int = 0, limit: int = 20) -> List[Poll]:
         """Get public polls."""
-        return db.query(Poll).filter(
+        return db.query(Poll).options(joinedload(Poll.options)).filter(
             Poll.is_public == True,
             Poll.is_active == True,
             or_(
@@ -117,7 +117,7 @@ class PollCRUD:
     
     def get_by_author(self, db: Session, author_id: UUID, skip: int = 0, limit: int = 20) -> List[Poll]:
         """Get polls by author."""
-        return db.query(Poll).filter(
+        return db.query(Poll).options(joinedload(Poll.options)).filter(
             Poll.author_id == author_id
         ).order_by(desc(Poll.created_at)).offset(skip).limit(limit).all()
     
@@ -209,7 +209,7 @@ class PollCRUD:
     
     def search(self, db: Session, query: str, skip: int = 0, limit: int = 20) -> List[Poll]:
         """Search polls by title or description."""
-        return db.query(Poll).filter(
+        return db.query(Poll).options(joinedload(Poll.options)).filter(
             and_(
                 Poll.is_public == True,
                 or_(
@@ -221,7 +221,7 @@ class PollCRUD:
     
     def get_trending(self, db: Session, skip: int = 0, limit: int = 20) -> List[Poll]:
         """Get trending polls (by votes and likes)."""
-        return db.query(Poll).filter(
+        return db.query(Poll).options(joinedload(Poll.options)).filter(
             Poll.is_public == True,
             Poll.is_active == True,
             or_(
@@ -235,7 +235,7 @@ class PollCRUD:
     
     def get_popular(self, db: Session, skip: int = 0, limit: int = 20) -> List[Poll]:
         """Get popular polls (by views)."""
-        return db.query(Poll).filter(
+        return db.query(Poll).options(joinedload(Poll.options)).filter(
             Poll.is_public == True,
             Poll.is_active == True,
             or_(
@@ -249,7 +249,7 @@ class PollCRUD:
     
     def get_recent(self, db: Session, skip: int = 0, limit: int = 20) -> List[Poll]:
         """Get recent polls."""
-        return db.query(Poll).filter(
+        return db.query(Poll).options(joinedload(Poll.options)).filter(
             Poll.is_public == True,
             Poll.is_active == True,
             or_(
@@ -260,7 +260,7 @@ class PollCRUD:
     
     def get_expired(self, db: Session, skip: int = 0, limit: int = 20) -> List[Poll]:
         """Get expired polls."""
-        return db.query(Poll).filter(
+        return db.query(Poll).options(joinedload(Poll.options)).filter(
             Poll.expires_at < func.now()
         ).order_by(desc(Poll.expires_at)).offset(skip).limit(limit).all()
     
