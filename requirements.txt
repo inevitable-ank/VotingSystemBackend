@@ -21,6 +21,7 @@ python-multipart==0.0.6
 pydantic==2.5.0
 pydantic-settings==2.1.0
 python-dotenv==1.0.0
+typing-extensions>=4.8.0
 
 # HTTP client
 httpx==0.25.2
@@ -58,3 +59,4 @@ python-decouple==3.8
 
 # Optional: For production deployment
 gunicorn==21.2.0
+

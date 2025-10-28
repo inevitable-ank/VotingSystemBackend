@@ -274,3 +274,4 @@ class SecurityLogger:
             action=action,
             ip_address=ip_address
         )
+

@@ -384,3 +384,4 @@ class TestVoteRoutes:
         # Verify poll total votes increased
         db_session.refresh(multiple_choice_poll)
         assert multiple_choice_poll.total_votes >= 2
+

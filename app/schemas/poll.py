@@ -137,3 +137,4 @@ from app.schemas.user import UserResponse
 
 # Update forward references
 PollDetail.model_rebuild()
+

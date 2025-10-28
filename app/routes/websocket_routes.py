@@ -358,3 +358,4 @@ async def broadcast_global_update(update_type: str, data: dict):
     }
     
     await manager.broadcast_to_all(json.dumps(message))
+

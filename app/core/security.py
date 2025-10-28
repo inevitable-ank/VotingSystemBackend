@@ -326,3 +326,4 @@ def validate_username(username: str) -> bool:
     import re
     pattern = r'^[a-zA-Z0-9_]{3,30}$'
     return bool(re.match(pattern, username))
+

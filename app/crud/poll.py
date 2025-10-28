@@ -307,3 +307,4 @@ class PollCRUD:
 
 # Create instance
 poll_crud = PollCRUD()
+

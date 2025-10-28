@@ -438,3 +438,4 @@ async def get_user_polls(
             status_code=500,
             error="internal_error"
         )
+

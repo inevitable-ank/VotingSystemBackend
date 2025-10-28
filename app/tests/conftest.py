@@ -416,3 +416,4 @@ def create_test_like(db_session, poll_id, user_id=None, anon_id=None):
     db_session.commit()
     db_session.refresh(like)
     return like
+

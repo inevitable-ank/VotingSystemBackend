@@ -122,3 +122,4 @@ async def close_upstash_client():
         await _upstash_client.close()
         _upstash_client = None
         logger.info("Upstash Redis client closed")
+

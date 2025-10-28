@@ -47,3 +47,4 @@ class User(Base):
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "last_login": self.last_login.isoformat() if self.last_login else None
         }
+

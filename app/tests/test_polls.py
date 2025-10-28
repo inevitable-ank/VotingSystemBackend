@@ -363,3 +363,4 @@ class TestPollRoutes:
         
         # Note: In a real implementation, you would verify the view count increased
         # This would require additional setup to check the database state
+

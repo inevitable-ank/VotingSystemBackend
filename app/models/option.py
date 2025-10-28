@@ -54,3 +54,4 @@ class Option(Base):
         """Decrement vote count."""
         if self.vote_count > 0:
             self.vote_count -= 1
+

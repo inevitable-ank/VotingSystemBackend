@@ -434,3 +434,4 @@ class NotificationService:
 
 # Create instance
 notification_service = NotificationService()
+

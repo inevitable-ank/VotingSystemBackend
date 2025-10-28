@@ -56,3 +56,4 @@ class Vote(Base):
     def is_anonymous(self) -> bool:
         """Check if vote is from anonymous user."""
         return self.user_id is None and self.anon_id is not None
+

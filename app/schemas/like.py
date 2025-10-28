@@ -106,3 +106,4 @@ class LikeStatus(BaseModel):
     likes_count: int
     can_like: bool
     reason: Optional[str] = None
+

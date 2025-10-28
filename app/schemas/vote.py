@@ -123,3 +123,4 @@ class VoteSummary(BaseModel):
     first_vote_at: datetime
     last_vote_at: datetime
     is_anonymous: bool
+

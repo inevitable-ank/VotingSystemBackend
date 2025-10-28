@@ -107,3 +107,4 @@ class UserPreferences(BaseModel):
     like_notifications: bool = False
     public_profile: bool = True
     show_email: bool = False
+

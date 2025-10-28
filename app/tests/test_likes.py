@@ -339,3 +339,4 @@ class TestLikeRoutes:
         # Test with invalid like ID format
         response = client.get("/likes/invalid-id")
         assert response.status_code == 422
+

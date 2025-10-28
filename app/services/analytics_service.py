@@ -407,3 +407,4 @@ class AnalyticsService:
 
 # Create instance
 analytics_service = AnalyticsService()
+

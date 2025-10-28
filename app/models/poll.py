@@ -92,3 +92,4 @@ class Poll(Base):
     def update_likes_count(self):
         """Update denormalized likes count."""
         self.likes_count = len(self.likes)
+
