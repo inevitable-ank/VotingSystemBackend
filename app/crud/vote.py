@@ -197,6 +197,17 @@ class VoteCRUD:
         """Get all votes for an option."""
         return db.query(Vote).filter(Vote.option_id == option_id).offset(skip).limit(limit).all()
     
+    def get_by_user(self, db: Session, user_id: UUID, skip: int = 0, limit: int = 100) -> List[Vote]:
+        """Get votes cast by a specific authenticated user."""
+        return (
+            db.query(Vote)
+            .filter(Vote.user_id == user_id)
+            .order_by(desc(Vote.created_at))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+    
     def get_with_details(self, db: Session, vote_id: UUID) -> Optional[Vote]:
         """Get vote with poll and option details."""
         return db.query(Vote).options(

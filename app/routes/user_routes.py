@@ -442,8 +442,18 @@ async def get_user_polls(
         
         polls = user_crud.get_user_polls(db=db, user_id=user_id, skip=skip, limit=limit)
         
-        return success_response(
-            data=polls,
+        # Serialize polls to plain dicts to avoid JSON serialization errors
+        poll_responses = [poll.to_dict(include_options=False) for poll in polls]
+
+        # Total count for pagination
+        from app.models.poll import Poll as PollModel
+        total = db.query(PollModel).filter(PollModel.author_id == user_id).count()
+
+        return paginated_response(
+            data=poll_responses,
+            page=(skip // limit) + 1,
+            per_page=limit,
+            total=total,
             message=f"Polls for user {user.username} retrieved successfully"
         )
         

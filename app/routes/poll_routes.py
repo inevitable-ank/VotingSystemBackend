@@ -15,7 +15,7 @@ from app.utils.response_helper import (
     created_response, updated_response, deleted_response, not_found_response
 )
 from app.utils.exceptions import PollNotFoundError, ValidationError, ConflictError
-from app.core.security import generate_anonymous_id
+from app.core.security import generate_anonymous_id, verify_token
 from app.utils.response_helper import unauthorized_response
 
 logger = logging.getLogger(__name__)
@@ -23,11 +23,39 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-def get_current_user(request: Request) -> Optional[UserResponse]:
-    """Get current user from request (placeholder for auth)."""
-    # This would be implemented with proper authentication
-    # For now, return None (anonymous user)
-    return None
+def get_current_user(request: Request, db: Session = Depends(get_db)) -> Optional[UserResponse]:
+    """Extract current user from Authorization Bearer token."""
+    auth_header = request.headers.get("authorization") or request.headers.get("Authorization")
+    if not auth_header or not auth_header.lower().startswith("bearer "):
+        return None
+
+    token = auth_header.split(" ", 1)[1].strip()
+    payload = verify_token(token)
+    if not payload:
+        return None
+
+    user_id = payload.get("sub")
+    if not user_id:
+        return None
+
+    user = user_crud.get(db, user_id)
+    if not user or not getattr(user, "is_active", True):
+        return None
+
+    try:
+        return UserResponse.model_validate(user)
+    except Exception:
+        # Fallback minimal mapping if validation fails
+        return UserResponse(
+            id=str(user.id),
+            username=user.username,
+            email=user.email,
+            is_active=user.is_active,
+            is_verified=getattr(user, "is_verified", False),
+            created_at=str(user.created_at),
+            updated_at=str(user.updated_at),
+            last_login=str(user.last_login) if getattr(user, "last_login", None) else None,
+        )
 
 
 def get_anonymous_id(request: Request) -> str:
