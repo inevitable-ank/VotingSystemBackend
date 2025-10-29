@@ -39,7 +39,6 @@ uuid==1.30
 pytest==7.4.3
 pytest-asyncio==0.21.1
 pytest-cov==4.1.0
-httpx==0.25.2
 
 # Logging and monitoring
 structlog==23.2.0
@@ -56,7 +55,4 @@ Pillow==10.1.0
 
 # Environment
 python-decouple==3.8
-
-# Optional: For production deployment
-gunicorn==21.2.0
 
