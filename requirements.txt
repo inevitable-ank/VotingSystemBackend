@@ -23,6 +23,9 @@ pydantic-settings==2.1.0
 python-dotenv==1.0.0
 typing-extensions>=4.8.0
 
+# Validation
+email-validator==2.1.0
+
 # HTTP client
 httpx==0.25.2
 aiohttp==3.9.1
