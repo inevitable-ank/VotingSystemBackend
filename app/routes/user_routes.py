@@ -11,6 +11,8 @@ from app.utils.response_helper import (
     success_response, error_response, paginated_response, 
     created_response, updated_response, deleted_response, not_found_response
 )
+from app.core.redis_client import get_cache, set_cache
+import json
 from app.utils.exceptions import UserNotFoundError, ValidationError, ConflictError
 from app.core.security import get_password_hash, verify_password, create_access_token
 
@@ -228,7 +230,6 @@ async def get_users(
             total=total,
             message="Users retrieved successfully"
         )
-        
     except Exception as e:
         logger.error(f"Error getting users: {e}")
         return error_response(
@@ -236,6 +237,24 @@ async def get_users(
             status_code=500,
             error="internal_error"
         )
+@router.get("/count", response_model=dict)
+async def get_users_count(db: Session = Depends(get_db)):
+    """Fast endpoint to return total user count (cached)."""
+    try:
+        cache_key = "stats:users:count"
+        cached = await get_cache(cache_key)
+        if cached:
+            return success_response(data={"total": int(cached)}, message="User count retrieved successfully")
+
+        total = user_crud.count(db=db)
+        try:
+            await set_cache(cache_key, str(total), expire=30)
+        except Exception:
+            pass
+        return success_response(data={"total": total}, message="User count retrieved successfully")
+    except Exception as e:
+        logger.error(f"Error getting users count: {e}")
+        return error_response(message="Failed to retrieve users count", status_code=500, error="internal_error")
 
 
 @router.get("/{user_id}", response_model=dict)

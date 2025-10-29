@@ -14,6 +14,10 @@ from app.utils.response_helper import (
     success_response, error_response, paginated_response, 
     created_response, updated_response, deleted_response, not_found_response
 )
+from fastapi.encoders import jsonable_encoder
+import json
+import asyncio
+from app.core.redis_client import get_cache, set_cache
 from app.utils.exceptions import PollNotFoundError, ValidationError, ConflictError
 from app.core.security import generate_anonymous_id, verify_token
 from app.utils.response_helper import unauthorized_response
@@ -272,7 +276,21 @@ async def search_polls(
 async def get_poll_stats(db: Session = Depends(get_db)):
     """Get poll statistics."""
     try:
+        # Try cache first
+        cache_key = "stats:polls"
+        cached = await get_cache(cache_key)
+        if cached:
+            return success_response(
+                data=json.loads(cached),
+                message="Poll statistics retrieved successfully"
+            )
+
         stats = poll_crud.get_stats(db)
+        # Cache the stats for a short time to improve first paint
+        try:
+            await set_cache(cache_key, json.dumps(jsonable_encoder(stats)), expire=30)
+        except Exception:
+            pass
         
         return success_response(
             data=stats,

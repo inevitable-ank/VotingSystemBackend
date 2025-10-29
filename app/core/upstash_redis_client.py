@@ -32,13 +32,11 @@ class UpstashRedisClient:
             return False
     
     async def set(self, key: str, value: str, ex: Optional[int] = None) -> bool:
-        """Set a key-value pair."""
+        """Set a key-value pair using Upstash REST semantics."""
         try:
-            data = {"key": key, "value": value}
-            if ex:
-                data["ex"] = ex
-            
-            response = await self.client.post(f"{self.base_url}/set", json=data)
+            url = f"{self.base_url}/set/{key}/{value}"
+            params = {"EX": ex} if ex else None
+            response = await self.client.post(url, params=params)
             return response.status_code == 200
         except Exception as e:
             logger.error(f"Redis set failed: {e}")

@@ -120,6 +120,10 @@ async def set_cache(key: str, value: str, expire: int = 3600) -> bool:
     try:
         client = await get_redis_client()
         if client:
+            # Upstash REST client path
+            if isinstance(client, UpstashRedisClient):
+                return await client.set(key, value, ex=expire)
+            # Traditional Redis client path
             await client.setex(key, expire, value)
             return True
         return False
