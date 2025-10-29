@@ -66,7 +66,7 @@ def get_anonymous_id(request: Request) -> str:
 
 @router.post("/", response_model=dict)
 async def cast_vote(
-    vote_data: VoteCreate,
+    vote_data: MultipleVoteCreate,
     request: Request,
     db: Session = Depends(get_db),
     current_user: Optional[UserResponse] = Depends(get_current_user)
@@ -113,7 +113,7 @@ async def cast_vote(
         
         # Check if user has already voted (for single-choice polls)
         if not poll.allow_multiple:
-            existing_vote = vote_crud.get_by_voter(
+            existing_vote = vote_crud.get_user_vote(
                 db=db, 
                 poll_id=vote_data.poll_id, 
                 user_id=voter_id, 
@@ -127,18 +127,32 @@ async def cast_vote(
                 )
         
         # Create votes
-        multiple_vote_data = MultipleVoteCreate(
-            poll_id=vote_data.poll_id,
-            option_ids=vote_data.option_ids,
-            anon_id=anon_id,
-            ip_address=request.client.host if request.client else None,
-            user_agent=request.headers.get("user-agent")
-        )
-        votes = vote_crud.create_multiple(
-            db=db,
-            vote_data=multiple_vote_data,
-            user_id=voter_id
-        )
+        if not poll.allow_multiple:
+            # Treat as single-choice: create one vote with the first option_id
+            single_vote = vote_crud.create(
+                db=db,
+                vote_data=VoteCreate(
+                    poll_id=vote_data.poll_id,
+                    option_id=vote_data.option_ids[0],
+                    anon_id=anon_id,
+                    ip_address=request.client.host if request.client else None,
+                    user_agent=request.headers.get("user-agent")
+                ),
+                user_id=voter_id
+            )
+            votes = [single_vote]
+        else:
+            votes = vote_crud.create_multiple(
+                db=db,
+                vote_data=MultipleVoteCreate(
+                    poll_id=vote_data.poll_id,
+                    option_ids=vote_data.option_ids,
+                    anon_id=anon_id,
+                    ip_address=request.client.host if request.client else None,
+                    user_agent=request.headers.get("user-agent")
+                ),
+                user_id=voter_id
+            )
         
         # Update poll vote counts
         poll_crud.update_vote_counts(db=db, poll_id=vote_data.poll_id)

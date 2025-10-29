@@ -1,4 +1,5 @@
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from typing import Any, Dict, Optional, Union
 from pydantic import BaseModel
 from app.utils.logger import get_logger
@@ -59,7 +60,7 @@ def success_response(
     
     return JSONResponse(
         status_code=status_code,
-        content=response_data.dict()
+        content=jsonable_encoder(response_data)
     )
 
 
@@ -90,7 +91,7 @@ def error_response(
     
     return JSONResponse(
         status_code=status_code,
-        content=response_data.dict()
+        content=jsonable_encoder(response_data)
     )
 
 
@@ -134,7 +135,7 @@ def paginated_response(
     
     return JSONResponse(
         status_code=200,
-        content=response_data.dict()
+        content=jsonable_encoder(response_data)
     )
 
 
