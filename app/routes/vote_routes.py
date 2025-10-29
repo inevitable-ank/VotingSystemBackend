@@ -15,6 +15,7 @@ from app.utils.response_helper import (
 )
 from app.utils.exceptions import VoteNotFoundError, ValidationError, ConflictError
 from app.core.security import generate_anonymous_id
+from app.utils.response_helper import unauthorized_response
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,9 @@ async def cast_vote(
 ):
     """Cast a vote on a poll."""
     try:
+        if not current_user:
+            return unauthorized_response(message="Authentication required to vote")
+
         # Get poll to validate
         poll = poll_crud.get_with_options(db=db, poll_id=vote_data.poll_id)
         if not poll:
@@ -75,9 +79,9 @@ async def cast_vote(
                     error="invalid_option"
                 )
         
-        # Get voter identifier
-        voter_id = current_user.id if current_user else None
-        anon_id = None if current_user else get_anonymous_id(request)
+        # Voter identifier must be authenticated
+        voter_id = current_user.id
+        anon_id = None
         
         # Check if user has already voted (for single-choice polls)
         if not poll.allow_multiple:

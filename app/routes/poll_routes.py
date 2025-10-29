@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, Request
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from typing import Optional, List
 from uuid import UUID
 import logging
@@ -15,6 +16,7 @@ from app.utils.response_helper import (
 )
 from app.utils.exceptions import PollNotFoundError, ValidationError, ConflictError
 from app.core.security import generate_anonymous_id
+from app.utils.response_helper import unauthorized_response
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +37,37 @@ def get_anonymous_id(request: Request) -> str:
     return generate_anonymous_id()
 
 
+@router.get("/db-health", response_model=dict)
+async def health_check(db: Session = Depends(get_db)):
+    """Database health check endpoint."""
+    try:
+        # Test basic database connection
+        result = db.execute(text("SELECT 1 as health_check"))
+        health_status = result.fetchone()[0] == 1
+        
+        # Test a simple poll query
+        from app.models.poll import Poll
+        poll_count = db.query(Poll).count()
+        
+        return success_response(
+            data={
+                "database": "connected" if health_status else "disconnected",
+                "poll_count": poll_count,
+                "status": "healthy" if health_status else "unhealthy"
+            },
+            message="Health check completed"
+        )
+        
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return error_response(
+            message="Health check failed",
+            status_code=503,
+            error="service_unavailable",
+            details=str(e)
+        )
+
+
 @router.get("/", response_model=dict)
 async def get_polls(
     skip: int = Query(0, ge=0, description="Number of polls to skip"),
@@ -47,6 +80,9 @@ async def get_polls(
 ):
     """Get list of polls with pagination."""
     try:
+        # Test database connection first
+        db.execute(text("SELECT 1"))
+        
         polls = poll_crud.get_multiple(
             db=db, 
             skip=skip, 
@@ -69,6 +105,13 @@ async def get_polls(
         
     except Exception as e:
         logger.error(f"Error getting polls: {e}")
+        # Check if it's a connection error
+        if "server closed the connection" in str(e) or "connection" in str(e).lower():
+            return error_response(
+                message="Database connection error. Please try again.",
+                status_code=503,
+                error="service_unavailable"
+            )
         return error_response(
             message="Failed to retrieve polls",
             status_code=500,
@@ -225,7 +268,10 @@ async def create_poll(
 ):
     """Create a new poll."""
     try:
-        author_id = current_user.id if current_user else None
+        if not current_user:
+            return unauthorized_response(message="Authentication required to create polls")
+        
+        author_id = current_user.id
         
         poll = poll_crud.create(
             db=db,

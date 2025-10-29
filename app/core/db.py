@@ -15,7 +15,10 @@ logger = logging.getLogger(__name__)
 engine_kwargs = {
     "echo": settings.database_echo,
     "pool_pre_ping": True,
-    "pool_recycle": 300,
+    "pool_recycle": 1800,  # 30 minutes for Neon
+    "pool_size": 5,        # Smaller pool for Neon
+    "max_overflow": 10,    # Allow overflow connections
+    "pool_timeout": 30,    # Timeout for getting connection from pool
 }
 
 # Handle SQLite for testing
@@ -56,7 +59,10 @@ def get_db() -> Generator[Session, None, None]:
         db.rollback()
         raise
     finally:
-        db.close()
+        try:
+            db.close()
+        except Exception as e:
+            logger.error(f"Error closing database session: {e}")
 
 
 def create_tables():

@@ -7,3 +7,4 @@ from .like import Like
 
 # Make models available for import
 __all__ = ["User", "Poll", "Option", "Vote", "Like"]
+
